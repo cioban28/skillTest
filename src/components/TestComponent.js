@@ -6,6 +6,7 @@ import { compose } from 'recompose'
 import { connect } from 'react-redux'
 import { item } from '../actions'
 import WithErrors from '../hocs/WithErrors'
+import { PAGE_SIZE } from '../utils';
 
 class testComponent extends React.Component {
 	constructor(props) {
@@ -15,7 +16,8 @@ class testComponent extends React.Component {
 
 	onFavourite(id) {
 		const { favourite } = this.props;
-		favourite(id);
+		let newId = (this.props.page - 1) * PAGE_SIZE + id;
+		favourite(newId);
 	}
 
 	render() {
@@ -91,6 +93,7 @@ class Tile extends React.Component {
 	render() {
 		// Modify styles based on state values
 		let tileStyle = {};
+		let thumbTileStyle = {};
 		let headerStyle = {};
 		let zoom = {};
 		// When tile clicked
@@ -109,7 +112,7 @@ class Tile extends React.Component {
 				zIndex: 100,
 			};
 		} else {
-			tileStyle = {
+			thumbTileStyle = {
 				width: '18vw',
 				height: '18vw'
 			};
@@ -128,24 +131,22 @@ class Tile extends React.Component {
 					/>
 				}
 
-			<div className="tile">
-				{!this.state.open && 
+				<div className="tile">
 					<img
 						onMouseEnter={this._mouseEnter}
 						onMouseLeave={this._mouseLeave}
 						onClick={this._clickHandler}
 						src={this.props.data.url}
 						alt={this.props.data.name}
-						style={tileStyle}
+						style={thumbTileStyle}
 					/>
-				}
-				<div className="favourite">
-					<img
-						src={this.props.data.favourite ? favorite : unfavorite}
-						onClick={this._onFavourite}
-					/>
+					<div className="favourite">
+						<img
+							src={this.props.data.favourite ? favorite : unfavorite}
+							onClick={this._onFavourite}
+						/>
+					</div>
 				</div>
-			</div>
 			</>
 		);
 	}

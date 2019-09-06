@@ -38,3 +38,13 @@ body {
 	top: 15px;
 	right: 15px;
 }
+
+.pagination {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+}
+
+.pagination button {
+	margin: 0 5px;
+}

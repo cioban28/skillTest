@@ -4,6 +4,7 @@ import { compose } from 'recompose'
 import { createStructuredSelector } from 'reselect'
 import { connect } from 'react-redux'
 import TestComponent from '../components/TestComponent';
+import Pagination from '../components/Pagination';
 
 import {
   testDataSelector,
@@ -14,7 +15,20 @@ import { item } from '../actions'
 import LoadingAnimation from '../components/LoadingAnimation'
 import WithErrors from '../hocs/WithErrors'
 
+import { PAGE_SIZE, FIRST_PAGE, PREV_PAGE, NEXT_PAGE, LAST_PAGE } from '../utils';
+
 class TestContainer extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      size: PAGE_SIZE,
+      page: 1
+    };
+
+    this.onPageChange = this.onPageChange.bind(this);
+  };
+
   static propTypes = {
     testData: PropTypes.oneOfType([
       PropTypes.object,
@@ -34,34 +48,71 @@ class TestContainer extends Component {
     loadPhotos();
   }
 
+  paginate(page, size) {
+    const { testData } = this.props;
+    let data = testData.slice((page - 1) * size, page * size);
+    return data;
+  };
+
+  onPageChange(type) {
+    switch (type) {
+      case FIRST_PAGE:
+        this.firstPage();
+        break;
+      case PREV_PAGE:
+        this.previousPage();
+        break;
+      case NEXT_PAGE:
+        this.nextPage();
+        break;
+      case LAST_PAGE:
+        this.lastPage();
+        break;
+    }
+  };
+
+  firstPage() {
+    this.setState({ page: 1 });
+  };
+
+  lastPage() {
+    const { testData } = this.props;
+    let page = Math.floor(testData.length / PAGE_SIZE) + 1;
+    this.setState({ page: page });
+  };
+
+  previousPage() {
+    const { page } = this.state;
+
+    if (page > 1) {
+      const newPage = page - 1;
+      this.setState({ page: newPage });
+    }
+  }
+
+  nextPage() {
+    const { testData } = this.props;
+    const { page } = this.state;
+    let totalPages = Math.floor(testData.length / PAGE_SIZE) + 1;
+    if (page < totalPages) {
+      const newPage = page + 1;
+      this.setState({ page: newPage });
+    }
+  }
+
   render() {
-    const { testData, fetching } = this.props
-    console.log(testData);
+    const { testData, fetching } = this.props;
+    const { page, size } = this.state;
     let count = testData.filter(item => item.favourite).length;
+    let pageData = this.paginate(page, size);
 
     if (fetching) return <LoadingAnimation />
 
     return (
       <div>
         <h1>{`Favourite Count: ${count}`}</h1>
-        {/* <h1>Test Container</h1>
-        <br />
-        <div className="row"> */}
-          {/* <div className="card">
-            <h4 className="card-header">
-              Test Data:
-            </h4>
-            <div className="card-body">
-              <h4 className="card-title">
-                {testData.title}
-              </h4>
-              <p className="card-text">
-                {testData.body}
-              </p> */}
-              <TestComponent data={testData}/>
-            {/* </div>
-          </div>
-        </div> */}
+        {pageData && <TestComponent data={pageData} page={page} />}
+        <Pagination onPageChange={(type) => this.onPageChange(type)} />
       </div>
     )
   }

@@ -37,7 +37,7 @@ function* handleGetOne(action) {
 function* handleGetPhotos() {
   try {
     const { data } = yield call(axios.get, 'https://jsonplaceholder.typicode.com/photos')
-    yield put(item.success({ data: data }))
+    yield put(item.success({ data }))
   } catch (e) {
     yield put(item.failure({ error: { ...e } }))
   }
