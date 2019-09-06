@@ -86,7 +86,6 @@ class Tile extends React.Component {
 	}
 
 	_onFavourite(e) {
-		console.log('test');
 		this.props.onFavourite();
 	}
 
