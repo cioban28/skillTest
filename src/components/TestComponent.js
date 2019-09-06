@@ -1,9 +1,26 @@
 import React from 'react'
+import favorite from '../assets/favorite.png';
+import unfavorite from '../assets/unfavorite.png';
+
+import { compose } from 'recompose'
+import { connect } from 'react-redux'
+import { item } from '../actions'
+import WithErrors from '../hocs/WithErrors'
 
 class testComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		this.onFavourite = this.onFavourite.bind(this);
+	}
+
+	onFavourite(id) {
+		const { favourite } = this.props;
+		favourite(id);
+	}
+
 	render() {
 		return (
-			<Tiles data={this.props.data} />
+			<Tiles data={this.props.data} onFavourite={(id) => this.onFavourite(id)} />
 		);
 	}
 }
@@ -14,8 +31,8 @@ class Tiles extends React.Component {
 		// Pass data to each tile and assign a key
 		return (
 			<div className="tiles">
-				{this.props.data.map((data) => {
-					return <Tile data={data} key={data.id} />
+				{this.props.data.map((data, index) => {
+					return <Tile data={data} key={data.id} onFavourite={() => this.props.onFavourite(index)} />
 				})}
 			</div>
 		);
@@ -33,6 +50,7 @@ class Tile extends React.Component {
 			this._clickHandler = this._clickHandler.bind(this);
 			this._mouseEnter = this._mouseEnter.bind(this);
 			this._mouseLeave = this._mouseLeave.bind(this);
+			this._onFavourite = this._onFavourite.bind(this);
 		}
 		// Event handlers to modify state values
 	_mouseEnter(e) {
@@ -65,6 +83,11 @@ class Tile extends React.Component {
 		}
 	}
 
+	_onFavourite(e) {
+		console.log('test');
+		this.props.onFavourite();
+	}
+
 	render() {
 		// Modify styles based on state values
 		let tileStyle = {};
@@ -82,7 +105,8 @@ class Tile extends React.Component {
 				marginTop: '-31vw',
 				marginLeft: '-31vw',
 				boxShadow: '0 0 40px 5px rgba(0, 0, 0, 0.3)',
-				transform: 'none'
+				transform: 'none',
+				zIndex: 100,
 			};
 		} else {
 			tileStyle = {
@@ -92,18 +116,46 @@ class Tile extends React.Component {
 		}
 
 		return (
+			<>
+				{this.state.open && 
+					<img
+						onMouseEnter={this._mouseEnter}
+						onMouseLeave={this._mouseLeave}
+						onClick={this._clickHandler}
+						src={this.props.data.url}
+						alt={this.props.data.name}
+						style={tileStyle}
+					/>
+				}
+
 			<div className="tile">
-				<img
-					onMouseEnter={this._mouseEnter}
-					onMouseLeave={this._mouseLeave}
-					onClick={this._clickHandler}
-					src={this.props.data.image}
-					alt={this.props.data.name}
-					style={tileStyle}
-				/>
+				{!this.state.open && 
+					<img
+						onMouseEnter={this._mouseEnter}
+						onMouseLeave={this._mouseLeave}
+						onClick={this._clickHandler}
+						src={this.props.data.url}
+						alt={this.props.data.name}
+						style={tileStyle}
+					/>
+				}
+				<div className="favourite">
+					<img
+						src={this.props.data.favourite ? favorite : unfavorite}
+						onClick={this._onFavourite}
+					/>
+				</div>
 			</div>
+			</>
 		);
 	}
 }
 
-export default testComponent
+const mapDispatchToProps = {
+  favourite: item.favourite
+}
+
+export default compose(
+  WithErrors,
+  connect(null, mapDispatchToProps),
+)(testComponent)

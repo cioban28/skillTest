@@ -34,6 +34,15 @@ function* handleGetOne(action) {
   }
 }
 
+function* handleGetPhotos() {
+  try {
+    const { data } = yield call(axios.get, 'https://jsonplaceholder.typicode.com/photos')
+    yield put(item.success({ data: data }))
+  } catch (e) {
+    yield put(item.failure({ error: { ...e } }))
+  }
+}
+
 function* handlePost(action) {
   try {
     const { saveData } = action.payload
@@ -78,6 +87,7 @@ function* watchExampleSagas() {
   yield all([
     takeLatest(ITEM.GET, handleGet),
     takeLatest(ITEM.GET_ONE, handleGetOne),
+    takeLatest(ITEM.GET_PHOTOS, handleGetPhotos),
     takeLatest(ITEM.SAVE, handlePost),
     takeLatest(ITEM.PUT, handlePut),
     takeLatest(ITEM.PATCH, handlePatch),

@@ -6,6 +6,8 @@ export const item = {
   requestOne: id => createAction(ITEM.GET_ONE, {
     id, fetching: true, success: false, error: null,
   }),
+  getPhotos: () => createAction(ITEM.GET_PHOTOS, { fetching: true, success: false, error: null }),
+  favourite: (id) => createAction(ITEM.FAVOURITE, { id, fetching: true, success: false, error: null }),
   save: data => createAction(ITEM.SAVE, {
     ...data, fetching: true, success: false, error: null,
   }),
